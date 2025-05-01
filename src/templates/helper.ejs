@@ -1,13 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+// 自動生成されたヘルパー - <%= model.model %>
 
 export const <%= model.model %>Helper = {
-<% model.relations.forEach(function(rel) { -%>
-        async <%= rel %>ById(id: number) {
-            return prisma.<%= model.model.toLowerCase() %>.findUnique({
-                where: { id },
-                include: { <%= rel %>: true }
-        }).then(r => r?.<%= rel %>);
-    },
-<% }); -%>
+  modelName: "<%= model.model %>",
+  relations: <%- JSON.stringify(model.relations) %>
 };

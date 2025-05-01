@@ -17,6 +17,7 @@ Thumbs.db
 
 # Build output
 dist/
+generated-helpers/
 build/
 
 # Env files

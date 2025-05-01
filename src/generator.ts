@@ -11,10 +11,16 @@ export async function generateHelpers(models: any[], outputPath: string) {
   );
 
   for (const model of models) {
+    // モデル名を取得
+    const modelName = model.name || model.model || 'UnknownModel';
+console.log('✅ outputPath:', outputPath);
+console.log('✅ models:', models);
+
     const content = ejs.render(template, { model });
     await fs.writeFile(
-      path.join(outputPath, `${model.model}Helper.ts`),
+      path.join(outputPath, `${modelName}Helper.ts`),
       content
     );
+    console.log(`✅ ${modelName}Helper.ts を生成しました`);
   }
 }

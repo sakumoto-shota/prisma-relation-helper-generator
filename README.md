@@ -1,45 +1,36 @@
-## リポジトリ情報
+# prisma-relation-helper-generator
 
-リポジトリ名：​prisma-relation-helper-generator
+Prismaの@relation情報から型安全なリレーションヘルパー関数を自動生成するGenerator
 
-GitHub URL：​https://github.com/sakumoto-shota/prisma-relation-helper-generator
+## インストール
 
-概要：​Prisma のスキーマファイル（schema.prisma）から、各モデルの@relation 情報を解析し、リレーションアクセサヘルパー関数を自動生成する Generator です。
-
-## リポジトリをクローン
-
-```
+```bash
+git clone https://github.com/sakumoto-shota/prisma-relation-helper-generator.git
+cd prisma-relation-helper-generator
 yarn install
-```
-
-## ビルド
-
-```
 yarn build
 ```
 
-## Prisma プロジェクトへの組み込み
+## Prismaスキーマ設定
 
-```
+```prisma
 generator relationHelper {
-  provider = "path:../prisma-relation-helper-generator/dist/index.js"
-  output   = "../generated-helpers"
+  provider = "path:./dist/index.js"
+  output   = "./generated-helpers"
 }
 ```
 
-## ヘルパー関数の生成
+## ヘルパー生成
 
-```
-npx prisma generate
+```bash
+yarn prisma generate
 ```
 
 ## 使用例
 
-```
-import { UserHelper } from '../generated-helpers/UserHelper';
+```typescript
+import { UserHelper } from './generated-helpers/UserHelper';
 
-(async () => {
-  const profile = await UserHelper.profileById(1);
-  console.log(profile?.image);
-})();
+const profile = await UserHelper.profileById(1);
+console.log(profile?.image);
 ```

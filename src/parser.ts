@@ -1,4 +1,4 @@
-interface ModelRelation {
+export interface ModelRelation {
   model: string;
   relations: string[];
 }

@@ -1,17 +1,22 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
 model User {
-    id      Int      @id @default(autoincrement())
-    name    String
-    profile Profile?
+  id      Int      @id @default(autoincrement())
+  name    String
+  profile Profile?
 }
 
 model Profile {
-    id     Int    @id @default(autoincrement())
-    image  String
-    user   User   @relation(fields: [userId], references: [id])
-    userId Int
+  id     Int    @id @default(autoincrement())
+  image  String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @unique
 }
 
-generator helper {
-    provider = "path:../dist/index.js"
-    output   = "../generated-helpers"
+generator relationHelper {
+  provider = "./dist/index.js"
+  output   = "../generated-helpers"
 }
