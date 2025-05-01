@@ -2,5 +2,18 @@
 
 export const <%= model.model %>Helper = {
   modelName: "<%= model.model %>",
-  relations: <%- JSON.stringify(model.relations) %>
+  relations: <%- JSON.stringify(model.relations) %>,
+
+  findById: async (id: number) => {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    return prisma.<%= model.model.toLowerCase() %>.findUnique({
+      where: { id },
+      include: {
+        <% for (const rel of model.relations) { %>
+        <%= rel %>: true,
+        <% } %>
+      }
+    });
+  }
 };

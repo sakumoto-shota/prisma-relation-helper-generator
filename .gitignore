@@ -18,6 +18,7 @@ Thumbs.db
 # Build output
 dist/
 generated-helpers/
+prisma/generated-helpers/
 build/
 
 # Env files

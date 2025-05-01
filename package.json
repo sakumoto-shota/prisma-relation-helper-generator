@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc && cp -R src/templates dist/templates && node ./add-shebang.js"
+    "build": "tsc && cp -R src/templates dist/templates && node ./add-shebang.js",
+    "seed": "npx ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/generator-helper": "^5.10.0",

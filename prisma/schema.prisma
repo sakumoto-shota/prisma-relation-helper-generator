@@ -16,6 +16,10 @@ model Profile {
   userId Int    @unique
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 generator relationHelper {
   provider = "./dist/index.js"
   output   = "../generated-helpers"
