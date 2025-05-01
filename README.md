@@ -1,36 +1,108 @@
-# prisma-relation-helper-generator
+# Prisma Relation Helper Generator
 
-Prismaの@relation情報から型安全なリレーションヘルパー関数を自動生成するGenerator
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## インストール
+**Prisma Relation Helper Generator** は、Prisma のモデルから Eloquent (Laravel) 風のヘルパーを自動生成する Prisma Generator です。  
+リレーション情報の取得や、`findById` メソッドなどを自動作成します。
+
+---
+
+## ✨ 特徴
+
+- Prisma モデルのリレーションを自動解析
+- `ModelHelper.findById(id)` 形式のヘルパーメソッドを自動生成
+- テンプレート（EJS）で自由にカスタマイズ可能
+- TypeScript 対応
+
+---
+
+## 📦 インストール
 
 ```bash
-git clone https://github.com/sakumoto-shota/prisma-relation-helper-generator.git
-cd prisma-relation-helper-generator
-yarn install
-yarn build
+yarn add -D prisma-relation-helper-generator
+※ 現在はローカル開発中。npm パブリッシュ後、正式版をインストール可能になります。
 ```
 
-## Prismaスキーマ設定
+## 📝 Prisma schema.prisma 設定例
 
-```prisma
+```
+generator client {
+  provider = "prisma-client-js"
+}
+
 generator relationHelper {
-  provider = "path:./dist/index.js"
+  provider = "./dist/index.js"
   output   = "./generated-helpers"
+}
+
+model User {
+  id     Int     @id @default(autoincrement())
+  name   String
+  profile Profile?
+}
+
+model Profile {
+  id      Int    @id @default(autoincrement())
+  image   String
+  user    User   @relation(fields: [userId], references: [id])
+  userId  Int    @unique
 }
 ```
 
-## ヘルパー生成
+## 🔧 ビルドとヘルパー生成
 
-```bash
+### ビルド（Generator の TypeScript コードを JavaScript に変換）
+
+```
+yarn build
+```
+
+### ヘルパーコード生成（Prisma generate）
+
+```
 yarn prisma generate
 ```
 
+generated-helpers/ ディレクトリに UserHelper.ts や ProfileHelper.ts が自動生成されます。
+
 ## 使用例
 
-```typescript
+```
 import { UserHelper } from './generated-helpers/UserHelper';
 
-const profile = await UserHelper.profileById(1);
-console.log(profile?.image);
+(async () => {
+  const user = await UserHelper.findById(1);
+  console.log(user?.profile?.image);
+})();
+```
+
+## シードデータ（オプション）
+
+```
+"scripts": {
+  "seed": "ts-node prisma/seed.ts"
+}
+```
+
+## 開発用スクリプト
+
+```
+"scripts": {
+  "clean": "rm -rf dist generated-helpers",
+  "build": "yarn clean && tsc && cp -R src/templates dist/templates && node ./add-shebang.js",
+  "generate": "yarn prisma generate",
+  "seed": "ts-node prisma/seed.ts"
+}
+```
+
+## 📄 ライセンス
+
+MIT © 2025 shota-sakumoto
+
+## 貢献
+
+Pull Request、Issue 大歓迎です！
+
+```
+git clone https://github.com/sakumoto-shota/prisma-relation-helper-generator.git
 ```

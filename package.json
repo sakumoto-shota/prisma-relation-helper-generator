@@ -1,10 +1,14 @@
 {
   "name": "prisma-relation-helper-generator",
   "version": "0.1.0",
-  "type": "commonjs",
+  "description": "A Prisma generator to create Eloquent-like model helpers.",
+  "author": "Shota Sakumoto",
+  "license": "MIT",
   "scripts": {
-    "build": "tsc && cp -R src/templates dist/templates && node ./add-shebang.js",
-    "seed": "npx ts-node prisma/seed.ts"
+    "clean": "rm -rf dist generated-helpers",
+    "build": "yarn clean && tsc && cp -R src/templates dist/templates && node ./add-shebang.js",
+    "seed": "npx ts-node prisma/seed.ts",
+    "generate": "yarn prisma generate"
   },
   "dependencies": {
     "@prisma/generator-helper": "^5.10.0",
@@ -17,6 +21,18 @@
     "prisma": "^6.7.0",
     "typescript": "^5.4.5",
     "undici": "^7.8.0",
-    "undici-types": "^7.8.0"
-  }
+    "undici-types": "^7.8.0",
+    "ts-node": "^10.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sakumoto-shota/prisma-relation-helper-generator.git"
+  },
+  "keywords": [
+    "prisma",
+    "generator",
+    "eloquent",
+    "relation",
+    "typescript"
+  ]
 }
