@@ -14,7 +14,7 @@ export class <%= model.model %>QueryBuilder {
   }
 
   async first(): Promise<Prisma.<%= model.model %>GetPayload<{
-    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
+    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true<% if (index < model.relations.length - 1) { %>,<% } %><% }); %> };
   }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findFirst({
       include: {<% model.relations.forEach((relation, index) => { %>
@@ -23,9 +23,11 @@ export class <%= model.model %>QueryBuilder {
     });
   }
 
-  async get(): Promise<Prisma.<%= model.model %>GetPayload<{
-    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
-  }>[]> {
+  async get(): Promise<
+    Prisma.<%= model.model %>GetPayload<{
+      include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true<% if (index < model.relations.length - 1) { %>,<% } %><% }); %> };
+    }>[]
+  > {
     return prisma.<%= model.model.toLowerCase() %>.findMany({
       include: {<% model.relations.forEach((relation, index) => { %>
         <%= relation %>: true,<% }); %>
@@ -34,7 +36,7 @@ export class <%= model.model %>QueryBuilder {
   }
 
   async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
-    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
+    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true<% if (index < model.relations.length - 1) { %>,<% } %><% }); %> };
   }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
       where: { id },
@@ -56,7 +58,7 @@ export const <%= model.model %>Helper = {
   relations: [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>],
 
   async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
-    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
+    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true<% if (index < model.relations.length - 1) { %>,<% } %><% }); %> };
   }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
       where: { id },
