@@ -63,12 +63,12 @@ yarn build
 yarn prisma generate
 ```
 
-generated-helpers/ ディレクトリに UserHelper.ts や ProfileHelper.ts が自動生成されます。
+./prisma/generated-helpers/ ディレクトリに UserHelper.ts や ProfileHelper.ts が自動生成されます。
 
 ## 使用例
 
 ```
-import { UserHelper } from './generated-helpers/UserHelper';
+import { UserHelper } from '../prisma/generated-helpers/UserHelper';
 
 (async () => {
   const user = await UserHelper.findById(1);

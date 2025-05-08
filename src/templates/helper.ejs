@@ -1,4 +1,39 @@
 // 自動生成されたヘルパー - <%= model.model %>
+import { PrismaClient, Prisma } from '@prisma/client';
+
+class <%= model.model %>QueryBuilder {
+  private prisma: PrismaClient;
+  private conditions: Prisma.<%= model.model %>WhereInput;
+  private includes: Record<string, boolean>;
+
+  constructor() {
+    this.prisma = new PrismaClient();
+    this.conditions = {};
+    this.includes = {};
+    <% for (const rel of model.relations) { %>
+    this.includes['<%= rel %>'] = true;
+    <% } %>
+  }
+
+  where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
+    this.conditions = conditions;
+    return this;
+  }
+
+  async first() {
+    return this.prisma.<%= model.model.toLowerCase() %>.findFirst({
+      where: this.conditions,
+      include: this.includes
+    });
+  }
+
+  async get() {
+    return this.prisma.<%= model.model.toLowerCase() %>.findMany({
+      where: this.conditions,
+      include: this.includes
+    });
+  }
+}
 
 export const <%= model.model %>Helper = {
   modelName: "<%= model.model %>",
@@ -15,5 +50,9 @@ export const <%= model.model %>Helper = {
         <% } %>
       }
     });
+  },
+
+  where(conditions: Prisma.<%= model.model %>WhereInput) {
+    return new <%= model.model %>QueryBuilder().where(conditions);
   }
 };

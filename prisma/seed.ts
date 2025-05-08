@@ -2,10 +2,10 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Profile を先に作成（user に紐づける）
-  const profile = await prisma.profile.create({
+  // テストユーザー1
+  const profile1 = await prisma.profile.create({
     data: {
-      image: 'https://example.com/image.jpg',
+      image: 'https://example.com/image1.jpg',
       user: {
         create: {
           name: 'テストユーザー'
@@ -17,7 +17,37 @@ async function main() {
     }
   });
 
-  console.log('Seeded profile:', profile);
+  // テストユーザー2（Taro）
+  const profile2 = await prisma.profile.create({
+    data: {
+      image: 'https://example.com/image2.jpg',
+      user: {
+        create: {
+          name: 'Taro'
+        }
+      }
+    },
+    include: {
+      user: true
+    }
+  });
+
+  // テストユーザー3（Taroを含む名前）
+  const profile3 = await prisma.profile.create({
+    data: {
+      image: 'https://example.com/image3.jpg',
+      user: {
+        create: {
+          name: 'Taro Yamada'
+        }
+      }
+    },
+    include: {
+      user: true
+    }
+  });
+
+  console.log('Seeded profiles:', { profile1, profile2, profile3 });
 }
 
 main()
