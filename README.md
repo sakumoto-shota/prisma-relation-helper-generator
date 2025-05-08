@@ -90,19 +90,39 @@ import { UserHelper } from '../prisma/generated-helpers/UserHelper';
 "scripts": {
   "clean": "rm -rf dist generated-helpers",
   "build": "yarn clean && tsc && cp -R src/templates dist/templates && node ./add-shebang.js",
-  "generate": "yarn prisma generate",
-  "seed": "ts-node prisma/seed.ts"
+  "generate": "yarn build && yarn prisma generate && yarn lint:fix",
+  "seed": "ts-node prisma/seed.ts",
+  "lint": "eslint . --ext .ts",
+  "lint:fix": "eslint . --ext .ts --fix"
 }
+```
+
+## 🚦 CI/CD
+
+このプロジェクトではGitHub Actionsを使用して以下の自動チェックを行っています：
+
+- ESLintによるコードの品質チェック
+- ビルドとPrisma生成のテスト
+- 生成されたファイルのフォーマットチェック
+
+PR作成時に自動的にこれらのチェックが実行されます。
+
+## 👥 コントリビューション
+
+コントリビューション大歓迎です！以下のガイドラインを参考にしてください：
+
+1. リポジトリをフォークし、機能ブランチを作成します
+2. コードを修正し、必要なテストを追加します
+3. `yarn lint`を実行してコードスタイルを確認します
+4. `yarn generate`を実行して、生成されたファイルが正しくフォーマットされていることを確認します
+5. 変更をコミットし、PRを作成します
+
+```
+git clone https://github.com/sakumoto-shota/prisma-relation-helper-generator.git
+cd prisma-relation-helper-generator
+yarn install
 ```
 
 ## 📄 ライセンス
 
 MIT © 2025 shota-sakumoto
-
-## 貢献
-
-Pull Request、Issue 大歓迎です！
-
-```
-git clone https://github.com/sakumoto-shota/prisma-relation-helper-generator.git
-```

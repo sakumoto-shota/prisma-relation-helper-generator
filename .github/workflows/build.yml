@@ -1,0 +1,37 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build and Generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Generate Prisma helpers
+        run: yarn prisma generate
+
+      - name: Check if generated files are properly formatted
+        run: |
+          yarn lint
+          if [ $? -ne 0 ]; then
+            echo "Generated files have linting errors. Please run 'yarn generate' locally and commit the changes."
+            exit 1
+          fi
