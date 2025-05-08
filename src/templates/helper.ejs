@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 
 export class <%= model.model %>QueryBuilder {
   private includes: Record<string, boolean> = {};
+  private conditions: Prisma.<%= model.model %>WhereInput = {};
 
   constructor() {
     this.includes = {<% model.relations.forEach((relation, index) => { %>
@@ -17,6 +18,7 @@ export class <%= model.model %>QueryBuilder {
     include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true<% if (index < model.relations.length - 1) { %>,<% } %><% }); %> };
   }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findFirst({
+      where: this.conditions,
       include: {<% model.relations.forEach((relation, index) => { %>
         <%= relation %>: true,<% }); %>
       },
@@ -29,6 +31,7 @@ export class <%= model.model %>QueryBuilder {
     }>[]
   > {
     return prisma.<%= model.model.toLowerCase() %>.findMany({
+      where: this.conditions,
       include: {<% model.relations.forEach((relation, index) => { %>
         <%= relation %>: true,<% }); %>
       },
@@ -47,8 +50,7 @@ export class <%= model.model %>QueryBuilder {
   }
 
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const unused = conditions;
+    this.conditions = conditions;
     return this;
   }
 }
@@ -69,8 +71,6 @@ export const <%= model.model %>Helper = {
   },
 
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const unused = conditions;
-    return new <%= model.model %>QueryBuilder();
+    return new <%= model.model %>QueryBuilder().where(conditions);
   },
 };
