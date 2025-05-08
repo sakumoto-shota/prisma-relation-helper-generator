@@ -4,6 +4,9 @@
   "description": "A Prisma generator to create Eloquent-like model helpers.",
   "author": "Shota Sakumoto",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "scripts": {
     "clean": "rm -rf dist generated-helpers",
     "build": "yarn clean && tsc && cp -R src/templates dist/templates && node ./add-shebang.js",
