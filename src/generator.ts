@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import * as ejs from 'ejs';
 import { DMMF } from '@prisma/generator-helper';
 import { parseRelations } from './parser';
@@ -18,9 +18,9 @@ export async function generate(
   // 注: parseRelations関数はDMMF.Model[]を返します
   const parsedModels = parseRelations(models);
 
-  // テンプレートファイルの読み込み
+  // テンプレートファイルの読み込み（非同期）
   const templatePath = path.join(__dirname, 'templates/helper.ejs');
-  const template = fs.readFileSync(templatePath, 'utf-8');
+  const template = await fs.readFile(templatePath, 'utf-8');
 
   // 各モデルに対してヘルパーファイルを生成
   for (const model of parsedModels) {
@@ -34,8 +34,11 @@ export async function generate(
       model: { model: model.name, relations },
     });
 
-    // ファイルに書き出し
-    fs.writeFileSync(path.join(outputPath, `${model.name}Helper.ts`), content);
+    // ファイルに書き出し（非同期）
+    await fs.writeFile(
+      path.join(outputPath, `${model.name}Helper.ts`),
+      content,
+    );
     console.log(`✅ ${model.name}Helper.ts を生成しました`);
   }
 }

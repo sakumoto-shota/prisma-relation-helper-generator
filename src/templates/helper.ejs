@@ -2,7 +2,20 @@
 import { PrismaClient } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// シングルトンパターンでPrismaClientを管理
+class PrismaClientSingleton {
+  private static instance: PrismaClient;
+
+  public static getInstance(): PrismaClient {
+    if (!PrismaClientSingleton.instance) {
+      PrismaClientSingleton.instance = new PrismaClient();
+    }
+    return PrismaClientSingleton.instance;
+  }
+}
+
+// PrismaClientのインスタンスを取得
+const prisma = PrismaClientSingleton.getInstance();
 
 export class <%= model.model %>QueryBuilder {
   private includes: Record<string, boolean> = {};
