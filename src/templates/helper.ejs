@@ -1,58 +1,74 @@
 // 自動生成されたヘルパー - <%= model.model %>
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
-class <%= model.model %>QueryBuilder {
-  private prisma: PrismaClient;
-  private conditions: Prisma.<%= model.model %>WhereInput;
-  private includes: Record<string, boolean>;
+const prisma = new PrismaClient();
+
+export class <%= model.model %>QueryBuilder {
+  private includes: Record<string, boolean> = {};
 
   constructor() {
-    this.prisma = new PrismaClient();
-    this.conditions = {};
-    this.includes = {};
-    <% for (const rel of model.relations) { %>
-    this.includes['<%= rel %>'] = true;
-    <% } %>
+    this.includes = {<% model.relations.forEach((relation, index) => { %>
+      <%= relation %>: true,<% }); %>
+    };
+  }
+
+  async first(): Promise<Prisma.<%= model.model %>GetPayload<{
+    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
+  }> | null> {
+    return prisma.<%= model.model.toLowerCase() %>.findFirst({
+      include: {<% model.relations.forEach((relation, index) => { %>
+        <%= relation %>: true,<% }); %>
+      },
+    });
+  }
+
+  async get(): Promise<Prisma.<%= model.model %>GetPayload<{
+    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
+  }>[]> {
+    return prisma.<%= model.model.toLowerCase() %>.findMany({
+      include: {<% model.relations.forEach((relation, index) => { %>
+        <%= relation %>: true,<% }); %>
+      },
+    });
+  }
+
+  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
+    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
+  }> | null> {
+    return prisma.<%= model.model.toLowerCase() %>.findUnique({
+      where: { id },
+      include: {<% model.relations.forEach((relation, index) => { %>
+        <%= relation %>: true,<% }); %>
+      },
+    });
   }
 
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
-    this.conditions = conditions;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const unused = conditions;
     return this;
-  }
-
-  async first() {
-    return this.prisma.<%= model.model.toLowerCase() %>.findFirst({
-      where: this.conditions,
-      include: this.includes
-    });
-  }
-
-  async get() {
-    return this.prisma.<%= model.model.toLowerCase() %>.findMany({
-      where: this.conditions,
-      include: this.includes
-    });
   }
 }
 
 export const <%= model.model %>Helper = {
-  modelName: "<%= model.model %>",
-  relations: <%- JSON.stringify(model.relations) %>,
+  modelName: '<%= model.model %>',
+  relations: [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>],
 
-  findById: async (id: number) => {
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
+  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
+    include: {<% model.relations.forEach((relation, index) => { %> <%= relation %>: true;<% }); %> };
+  }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
       where: { id },
-      include: {
-        <% for (const rel of model.relations) { %>
-        <%= rel %>: true,
-        <% } %>
-      }
+      include: {<% model.relations.forEach((relation, index) => { %>
+        <%= relation %>: true,<% }); %>
+      },
     });
   },
 
-  where(conditions: Prisma.<%= model.model %>WhereInput) {
-    return new <%= model.model %>QueryBuilder().where(conditions);
-  }
+  where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const unused = conditions;
+    return new <%= model.model %>QueryBuilder();
+  },
 };

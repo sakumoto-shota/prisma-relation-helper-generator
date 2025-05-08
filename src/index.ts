@@ -1,7 +1,7 @@
 import { generatorHandler } from '@prisma/generator-helper';
 import type { GeneratorOptions } from '@prisma/generator-helper';
 import { parseRelations } from './parser';
-import { generateHelpers } from './generator';
+import { generate } from './generator';
 
 generatorHandler({
   onManifest() {
@@ -15,6 +15,6 @@ generatorHandler({
 
     const outputPath = options.generator.output?.value || './generated-helpers';
 
-    await generateHelpers(models, outputPath);
+    await generate(models, outputPath);
   },
 });

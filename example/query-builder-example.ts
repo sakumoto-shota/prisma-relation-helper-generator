@@ -1,15 +1,24 @@
+import { PrismaClient } from '@prisma/client';
 import { UserHelper } from '../prisma/generated-helpers/UserHelper';
 
-(async () => {
-  // 単一レコードの取得
-  const user = await UserHelper.where({ name: "Taro" }).first();
-  console.log('Single user:', user);
+const prisma = new PrismaClient();
 
-  // 複数レコードの取得
-  const users = await UserHelper.where({ name: { contains: "Taro" } }).get();
-  console.log('Multiple users:', users);
+(async (): Promise<void> => {
+  try {
+    // 単一レコードの取得
+    const user = await UserHelper.where({ name: 'Taro' }).first();
+    console.log('Single user:', user);
 
-  // リレーションを含む取得
-  const userWithProfile = await UserHelper.where({ name: "Taro" }).first();
-  console.log('User with profile:', userWithProfile?.profile);
-})(); 
+    // 複数レコードの取得
+    const users = await UserHelper.where({ name: { contains: 'Taro' } }).get();
+    console.log('Multiple users:', users);
+
+    // リレーションを含む取得
+    const userWithProfile = await UserHelper.where({ name: 'Taro' }).first();
+    console.log('User with profile:', userWithProfile?.profile);
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+})();
