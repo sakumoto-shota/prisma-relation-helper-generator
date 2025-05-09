@@ -1,21 +1,5 @@
 import { UserHelper } from '../prisma/generated-helpers/UserHelper';
-import { PrismaClient } from '@prisma/client';
-
-// ヘルパーとの共通インスタンスを使用するためのシングルトンクラス
-// 注: 実際のアプリケーションでは、このPrismaClientSingletonクラスを共通モジュールに定義すると良いでしょう
-class PrismaClientSingleton {
-  private static instance: PrismaClient;
-
-  public static getInstance(): PrismaClient {
-    if (!PrismaClientSingleton.instance) {
-      PrismaClientSingleton.instance = new PrismaClient();
-    }
-    return PrismaClientSingleton.instance;
-  }
-}
-
-// 既存のシングルトンインスタンスを取得
-const prisma = PrismaClientSingleton.getInstance();
+import { prisma } from '../src/prisma-client';
 
 (async (): Promise<void> => {
   try {
