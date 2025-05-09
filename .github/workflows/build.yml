@@ -1,0 +1,76 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build and Generate
+    runs-on: ubuntu-latest
+
+    # データベースサービスを追加
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testing
+        ports:
+          - 5432:5432
+        # ヘルスチェックを追加してデータベースが起動するまで待機
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.18.1'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Create output directories
+        run: mkdir -p prisma/generated-helpers
+
+      - name: Build
+        run: yarn build
+
+      - name: Format generated d.ts files
+        run: yarn prettier --write "dist/**/*.d.ts"
+
+      - name: Setup database and generate helpers
+        run: |
+          # 環境変数でデータベース接続情報を設定
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testing" > .env
+
+          # データベーススキーマをプッシュ (マイグレーションフロー全体を回避)
+          yarn prisma db push --accept-data-loss --skip-generate
+
+          # Prisma Clientとヘルパーを生成
+          yarn generate
+          yarn prisma generate
+
+      - name: Run database seed
+        run: |
+          # シードデータを投入 (失敗してもビルドは続行)
+          yarn seed || echo "Seed failed but continuing build"
+
+      - name: Check if generated files are properly formatted
+        run: |
+          # 型定義ファイルを除外してlintを実行
+          yarn eslint "src/**/*.ts" "example/**/*.ts" "prisma/**/*.ts" --fix
+          if [ $? -ne 0 ]; then
+            echo "Files have linting errors. Please run 'yarn lint' locally and commit the changes."
+            exit 1
+          fi

@@ -1,58 +1,75 @@
 // 自動生成されたヘルパー - <%= model.model %>
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+// PrismaClientSingletonの共通モジュールをインポート
+import { prisma } from '../../src/prisma-client';
 
-class <%= model.model %>QueryBuilder {
-  private prisma: PrismaClient;
-  private conditions: Prisma.<%= model.model %>WhereInput;
-  private includes: Record<string, boolean>;
+/**
+ * リレーションのincludeオブジェクトを生成するヘルパー関数
+ * @returns リレーションを含むincludeオブジェクト
+ */
+function generateIncludeObject(): { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> } {
+  return {<% model.relations.forEach((relation, index) => { %>
+    <%= relation %>: true,<% }); %>
+  };
+}
+
+export class <%= model.model %>QueryBuilder {
+  private includes: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
+  private conditions: Prisma.<%= model.model %>WhereInput = {};
 
   constructor() {
-    this.prisma = new PrismaClient();
-    this.conditions = {};
-    this.includes = {};
-    <% for (const rel of model.relations) { %>
-    this.includes['<%= rel %>'] = true;
-    <% } %>
+    this.includes = generateIncludeObject();
+  }
+
+  async first(): Promise<Prisma.<%= model.model %>GetPayload<{
+    include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
+  }> | null> {
+    return prisma.<%= model.model.toLowerCase() %>.findFirst({
+      where: this.conditions,
+      include: this.includes,
+    });
+  }
+
+  async get(): Promise<
+    Prisma.<%= model.model %>GetPayload<{
+      include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
+    }>[]
+  > {
+    return prisma.<%= model.model.toLowerCase() %>.findMany({
+      where: this.conditions,
+      include: this.includes,
+    });
+  }
+
+  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
+    include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
+  }> | null> {
+    return prisma.<%= model.model.toLowerCase() %>.findUnique({
+      where: { id },
+      include: this.includes,
+    });
   }
 
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
     this.conditions = conditions;
     return this;
   }
-
-  async first() {
-    return this.prisma.<%= model.model.toLowerCase() %>.findFirst({
-      where: this.conditions,
-      include: this.includes
-    });
-  }
-
-  async get() {
-    return this.prisma.<%= model.model.toLowerCase() %>.findMany({
-      where: this.conditions,
-      include: this.includes
-    });
-  }
 }
 
 export const <%= model.model %>Helper = {
-  modelName: "<%= model.model %>",
-  relations: <%- JSON.stringify(model.relations) %>,
+  modelName: '<%= model.model %>',
+  relations: [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>],
 
-  findById: async (id: number) => {
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
+  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
+    include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
+  }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
       where: { id },
-      include: {
-        <% for (const rel of model.relations) { %>
-        <%= rel %>: true,
-        <% } %>
-      }
+      include: generateIncludeObject(),
     });
   },
 
-  where(conditions: Prisma.<%= model.model %>WhereInput) {
+  where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
     return new <%= model.model %>QueryBuilder().where(conditions);
-  }
+  },
 };
