@@ -10,6 +10,24 @@ jobs:
   build:
     name: Build and Generate
     runs-on: ubuntu-latest
+
+    # データベースサービスを追加
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testing
+        ports:
+          - 5432:5432
+        # ヘルスチェックを追加してデータベースが起動するまで待機
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
 
@@ -22,11 +40,27 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Create output directories
+        run: mkdir -p prisma/generated-helpers
+
       - name: Build
         run: yarn build
 
-      - name: Generate Prisma helpers
-        run: yarn prisma generate
+      - name: Setup database and generate helpers
+        run: |
+          # 環境変数でデータベース接続情報を設定
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testing" > .env
+
+          # データベーススキーマをプッシュ (マイグレーションフロー全体を回避)
+          yarn prisma db push --accept-data-loss --skip-generate
+
+          # Prisma Clientとヘルパーを生成
+          yarn prisma generate
+
+      - name: Run database seed
+        run: |
+          # シードデータを投入 (失敗してもビルドは続行)
+          yarn seed || echo "Seed failed but continuing build"
 
       - name: Check if generated files are properly formatted
         run: |
