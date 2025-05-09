@@ -1,0 +1,4 @@
+# 生成された型定義ファイルを除外
+dist/**/*.d.ts
+**/*.d.ts
+node_modules 

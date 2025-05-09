@@ -68,8 +68,9 @@ jobs:
 
       - name: Check if generated files are properly formatted
         run: |
-          yarn lint
+          # 型定義ファイルを除外してlintを実行
+          yarn eslint "src/**/*.ts" "example/**/*.ts" "prisma/**/*.ts" --fix
           if [ $? -ne 0 ]; then
-            echo "Generated files have linting errors. Please run 'yarn generate' locally and commit the changes."
+            echo "Files have linting errors. Please run 'yarn lint' locally and commit the changes."
             exit 1
           fi

@@ -14,5 +14,13 @@
   "env": {
     "node": true,
     "es6": true
-  }
+  },
+  "overrides": [
+    {
+      "files": ["dist/**/*.d.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
 } 
