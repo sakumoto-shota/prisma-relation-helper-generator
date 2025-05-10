@@ -6,6 +6,7 @@ import { prisma } from '../../src/prisma-client';
 export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.model %>Include = object> {
   private includes: Include = {} as Include;
   private conditions: Prisma.<%= model.model %>WhereInput = {};
+  private order: Prisma.<%= model.model %>OrderByWithRelationInput[] = [];
 
   // モデルごとの全リレーション名
   static allRelations = [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>];
@@ -40,10 +41,16 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     return this as any;
   }
 
+  orderBy(column: keyof Prisma.<%= model.model %>OrderByWithRelationInput, direction: 'asc' | 'desc'): this {
+    this.order.push({ [column]: direction } as Prisma.<%= model.model %>OrderByWithRelationInput);
+    return this;
+  }
+
   async first(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findFirst({
       where: this.conditions,
       include: this.getIncludeWithDefaults(),
+      orderBy: this.order.length > 0 ? this.order : undefined,
     });
   }
 
@@ -51,6 +58,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     return prisma.<%= model.model.toLowerCase() %>.findMany({
       where: this.conditions,
       include: this.getIncludeWithDefaults(),
+      orderBy: this.order.length > 0 ? this.order : undefined,
     });
   }
 

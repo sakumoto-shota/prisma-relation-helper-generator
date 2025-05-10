@@ -20,6 +20,24 @@ import { prisma } from '../src/prisma-client';
       .where({ name: 'Taro' })
       .first();
     console.log('User with profile:', userWithProfile?.profile);
+
+    // createdAt昇順
+    const usersAsc = await UserHelper.where({})
+      .orderBy('createdAt', 'asc')
+      .get();
+    console.log(
+      'Users (createdAt asc):',
+      usersAsc.map((u) => ({ name: u.name, createdAt: u.createdAt })),
+    );
+
+    // createdAt降順
+    const usersDesc = await UserHelper.where({})
+      .orderBy('createdAt', 'desc')
+      .get();
+    console.log(
+      'Users (createdAt desc):',
+      usersDesc.map((u) => ({ name: u.name, createdAt: u.createdAt })),
+    );
   } catch (error) {
     console.error('Error:', error);
   } finally {
