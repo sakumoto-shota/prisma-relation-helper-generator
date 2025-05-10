@@ -3,54 +3,65 @@ import { Prisma } from '@prisma/client';
 // PrismaClientSingletonの共通モジュールをインポート
 import { prisma } from '../../src/prisma-client';
 
-/**
- * リレーションのincludeオブジェクトを生成するヘルパー関数
- * @returns リレーションを含むincludeオブジェクト
- */
-function generateIncludeObject(): { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> } {
-  return {<% model.relations.forEach((relation, index) => { %>
-    <%= relation %>: true,<% }); %>
-  };
-}
-
-export class <%= model.model %>QueryBuilder {
-  private includes: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
+export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.model %>Include = object> {
+  private includes: Include = {} as Include;
   private conditions: Prisma.<%= model.model %>WhereInput = {};
 
-  constructor() {
-    this.includes = generateIncludeObject();
+  // モデルごとの全リレーション名
+  static allRelations = [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>];
+
+  private getIncludeWithDefaults(): Prisma.<%= model.model %>Include {
+    if (Object.keys(this.includes).length === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const all: any = {};
+      (<%= model.model %>QueryBuilder.allRelations as (keyof Prisma.<%= model.model %>Include)[]).forEach(rel => {
+        all[rel] = true;
+      });
+      return all;
+    }
+    return this.includes as Prisma.<%= model.model %>Include;
   }
 
-  async first(): Promise<Prisma.<%= model.model %>GetPayload<{
-    include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
-  }> | null> {
+  /**
+   * リレーションを動的に指定する（型安全）
+   * @param relations Prisma.<%= model.model %>Includeのキーまたは配列
+   */
+  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<Include & { [P in K]: true }> {
+    if (Array.isArray(relations)) {
+      for (const rel of relations) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (this.includes as any)[rel] = true;
+      }
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (this.includes as any)[relations] = true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this as any;
+  }
+
+  async first(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findFirst({
       where: this.conditions,
-      include: this.includes,
+      include: this.getIncludeWithDefaults(),
     });
   }
 
-  async get(): Promise<
-    Prisma.<%= model.model %>GetPayload<{
-      include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
-    }>[]
-  > {
+  async get(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }>[]> {
     return prisma.<%= model.model.toLowerCase() %>.findMany({
       where: this.conditions,
-      include: this.includes,
+      include: this.getIncludeWithDefaults(),
     });
   }
 
-  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
-    include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
-  }> | null> {
+  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
       where: { id },
-      include: this.includes,
+      include: this.getIncludeWithDefaults(),
     });
   }
 
-  where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
+  where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder<Include> {
     this.conditions = conditions;
     return this;
   }
@@ -60,16 +71,19 @@ export const <%= model.model %>Helper = {
   modelName: '<%= model.model %>',
   relations: [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>],
 
-  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{
-    include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<% if (index < model.relations.length - 1) { %>; <% } %><% }); %> };
-  }> | null> {
+  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{ include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %> } }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
       where: { id },
-      include: generateIncludeObject(),
+      include: {<% model.relations.forEach((relation, index) => { %>
+        <%= relation %>: true<%= index < model.relations.length - 1 ? ',' : '' %>
+      <% }); %>},
     });
   },
 
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
     return new <%= model.model %>QueryBuilder().where(conditions);
+  },
+  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<{ [P in K]: true }> {
+    return new <%= model.model %>QueryBuilder().with(relations);
   },
 };

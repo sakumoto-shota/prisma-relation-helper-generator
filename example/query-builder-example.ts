@@ -12,7 +12,13 @@ import { prisma } from '../src/prisma-client';
     console.log('Multiple users:', users);
 
     // リレーションを含む取得
-    const userWithProfile = await UserHelper.where({ name: 'Taro' }).first();
+    const userAndProfile = await UserHelper.where({ name: 'Taro' }).first();
+    console.log('User and profile:', userAndProfile?.profile);
+
+    // リレーションを含むeager loading取得
+    const userWithProfile = await UserHelper.with('profile')
+      .where({ name: 'Taro' })
+      .first();
     console.log('User with profile:', userWithProfile?.profile);
   } catch (error) {
     console.error('Error:', error);

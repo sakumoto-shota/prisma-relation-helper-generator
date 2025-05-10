@@ -2,52 +2,62 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
-  // テストユーザー1
-  const profile1 = await prisma.profile.create({
+  // ユーザー1
+  const user1 = await prisma.user.create({
     data: {
-      image: 'https://example.com/image1.jpg',
-      user: {
+      name: 'Taro',
+      profile: {
         create: {
-          name: 'テストユーザー',
+          image: 'https://example.com/image1.jpg',
         },
       },
-    },
-    include: {
-      user: true,
-    },
-  });
-
-  // テストユーザー2（Taro）
-  const profile2 = await prisma.profile.create({
-    data: {
-      image: 'https://example.com/image2.jpg',
-      user: {
-        create: {
-          name: 'Taro',
-        },
+      posts: {
+        create: [
+          { title: 'Taro Post 1', content: 'Content 1' },
+          { title: 'Taro Post 2', content: 'Content 2' },
+        ],
       },
     },
-    include: {
-      user: true,
-    },
+    include: { profile: true, posts: true },
   });
 
-  // テストユーザー3（Taroを含む名前）
-  const profile3 = await prisma.profile.create({
+  // ユーザー2
+  const user2 = await prisma.user.create({
     data: {
-      image: 'https://example.com/image3.jpg',
-      user: {
+      name: 'Hanako',
+      profile: {
         create: {
-          name: 'Taro Yamada',
+          image: 'https://example.com/image2.jpg',
         },
       },
+      posts: {
+        create: [{ title: 'Hanako Post 1', content: 'Content 1' }],
+      },
     },
-    include: {
-      user: true,
-    },
+    include: { profile: true, posts: true },
   });
 
-  console.log('Seeded profiles:', { profile1, profile2, profile3 });
+  // ユーザー3
+  const user3 = await prisma.user.create({
+    data: {
+      name: 'Jiro',
+      profile: {
+        create: {
+          image: 'https://example.com/image3.jpg',
+        },
+      },
+      posts: {
+        create: [
+          { title: 'Jiro Post 1', content: 'Content 1' },
+          { title: 'Jiro Post 2', content: 'Content 2' },
+          { title: 'Jiro Post 3', content: 'Content 3' },
+        ],
+      },
+    },
+    include: { profile: true, posts: true },
+  });
+
+  console.log('Seed data created:', { user1, user2, user3 });
 }
 
 main()
