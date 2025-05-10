@@ -24,6 +24,18 @@
 
 ---
 
+## 🆕 論理削除（soft delete）・CRUD強化
+
+- Prismaモデルに `deletedAt` フィールドを追加することで論理削除（soft delete）に自動対応
+- 生成されるHelper/QueryBuilderの `delete` メソッドで `enableSoftDelete`/`softDelete` フラグに応じて論理削除・物理削除を自動切り替え
+- `UserHelper` などのヘルパーオブジェクトに `enableSoftDelete` プロパティを追加し、`UserHelper.enableSoftDelete = true` で論理削除を有効化可能
+- example/extended/UserHelper.ts で `enableSoftDelete: true` をデフォルト有効化した拡張例を提供
+- テンプレート（helper.ejs）でUserHelper/QueryBuilderごとに適切なフラグ判定を行うよう分岐
+- generator.tsでテンプレートに `fields` を渡すことでdeletedAt判定の型安全性を向上
+- example配下の利用例で論理削除・物理削除の切り替え動作を確認可能
+
+---
+
 ## 📦 インストール
 
 ```bash
