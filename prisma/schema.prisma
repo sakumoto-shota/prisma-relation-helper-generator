@@ -4,10 +4,11 @@ datasource db {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  name    String
-  profile Profile?
-  posts   Post[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  profile   Profile?
+  posts     Post[]
 }
 
 model Profile {

@@ -6,6 +6,7 @@ async function main(): Promise<void> {
   const user1 = await prisma.user.create({
     data: {
       name: 'Taro',
+      createdAt: new Date('2024-05-01T10:00:00Z'),
       profile: {
         create: {
           image: 'https://example.com/image1.jpg',
@@ -25,6 +26,7 @@ async function main(): Promise<void> {
   const user2 = await prisma.user.create({
     data: {
       name: 'Hanako',
+      createdAt: new Date('2024-05-02T10:00:00Z'),
       profile: {
         create: {
           image: 'https://example.com/image2.jpg',
@@ -41,6 +43,7 @@ async function main(): Promise<void> {
   const user3 = await prisma.user.create({
     data: {
       name: 'Jiro',
+      createdAt: new Date('2024-05-03T10:00:00Z'),
       profile: {
         create: {
           image: 'https://example.com/image3.jpg',

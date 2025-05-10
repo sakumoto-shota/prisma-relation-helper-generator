@@ -14,6 +14,7 @@
 - テンプレート（EJS）で自由にカスタマイズ可能
 - TypeScript 対応
 - **型安全なリレーション事前読み込み**
+- **orderByによる型安全なソートチェーンが可能（例：orderBy('createdAt', 'desc')）**
 - **withを使わなくても、全リレーションが自動でeager loadされます（自動eager load化）**
 - 例：
 - const user = await UserHelper.where({ name: 'Taro' }).first();
@@ -94,6 +95,22 @@ import { UserHelper } from '../prisma/generated-helpers/UserHelper';
     .where({ name: 'Taro' })
     .first();
   console.log('User with profile:', userWithProfile?.profile);
+
+  // createdAt昇順ソート
+  const usersAsc = await UserHelper.where({}).orderBy('createdAt', 'asc').get();
+  console.log(
+    'Users (createdAt asc):',
+    usersAsc.map((u) => ({ name: u.name, createdAt: u.createdAt })),
+  );
+
+  // createdAt降順ソート
+  const usersDesc = await UserHelper.where({})
+    .orderBy('createdAt', 'desc')
+    .get();
+  console.log(
+    'Users (createdAt desc):',
+    usersDesc.map((u) => ({ name: u.name, createdAt: u.createdAt })),
+  );
 })();
 ```
 
