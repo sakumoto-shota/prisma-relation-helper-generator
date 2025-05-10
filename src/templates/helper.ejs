@@ -1,5 +1,5 @@
 // 自動生成されたヘルパー - <%= model.model %>
-import { Prisma } from '@prisma/client';
+import { Prisma, <%= model.model %> } from '@prisma/client';
 // PrismaClientSingletonの共通モジュールをインポート
 import { prisma } from '../../src/prisma-client';
 
@@ -7,6 +7,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
   private includes: Include = {} as Include;
   private conditions: Prisma.<%= model.model %>WhereInput = {};
   private order: Prisma.<%= model.model %>OrderByWithRelationInput[] = [];
+  private softDelete: boolean = false;
 
   // モデルごとの全リレーション名
   static allRelations = [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>];
@@ -46,25 +47,42 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     return this;
   }
 
+  enableSoftDelete(): this {
+    this.softDelete = true;
+    return this;
+  }
+
   async first(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
+    const where: Prisma.<%= model.model %>WhereInput = { ...this.conditions };
+    if (this.softDelete) {
+      Object.assign(where, { deletedAt: null });
+    }
     return prisma.<%= model.model.toLowerCase() %>.findFirst({
-      where: this.conditions,
+      where,
       include: this.getIncludeWithDefaults(),
       orderBy: this.order.length > 0 ? this.order : undefined,
     });
   }
 
   async get(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }>[]> {
+    const where: Prisma.<%= model.model %>WhereInput = { ...this.conditions };
+    if (this.softDelete) {
+      Object.assign(where, { deletedAt: null });
+    }
     return prisma.<%= model.model.toLowerCase() %>.findMany({
-      where: this.conditions,
+      where,
       include: this.getIncludeWithDefaults(),
       orderBy: this.order.length > 0 ? this.order : undefined,
     });
   }
 
   async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
+    const where: Prisma.<%= model.model %>WhereUniqueInput & { deletedAt?: null } = { id };
+    if (this.softDelete) {
+      where.deletedAt = null;
+    }
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
-      where: { id },
+      where,
       include: this.getIncludeWithDefaults(),
     });
   }
@@ -73,11 +91,67 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     this.conditions = conditions;
     return this;
   }
+
+  async delete(id: number): Promise<<%= model.model %>> {
+<% if (model.fields && model.fields.some(f => f.name === 'deletedAt')) { %>
+    if (this.softDelete) {
+      // 論理削除
+      return prisma.<%= model.model.toLowerCase() %>.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+    } else {
+      // 物理削除
+      return prisma.<%= model.model.toLowerCase() %>.delete({
+        where: { id },
+      });
+    }
+<% } else { %>
+    // 物理削除
+    return prisma.<%= model.model.toLowerCase() %>.delete({
+      where: { id },
+    });
+<% } %>
+  }
 }
 
 export const <%= model.model %>Helper = {
   modelName: '<%= model.model %>',
   relations: [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>],
+  enableSoftDelete: false,
+
+  async create(data: Prisma.<%= model.model %>CreateInput): Promise<<%= model.model %>> {
+    return prisma.<%= model.model.toLowerCase() %>.create({ data });
+  },
+
+  async update(id: number, data: Prisma.<%= model.model %>UpdateInput): Promise<<%= model.model %>> {
+    return prisma.<%= model.model.toLowerCase() %>.update({
+      where: { id },
+      data,
+    });
+  },
+
+  async delete(id: number): Promise<<%= model.model %>> {
+<% if (model.fields && model.fields.some(f => f.name === 'deletedAt')) { %>
+    if (this.enableSoftDelete) {
+      // 論理削除
+      return prisma.<%= model.model.toLowerCase() %>.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+    } else {
+      // 物理削除
+      return prisma.<%= model.model.toLowerCase() %>.delete({
+        where: { id },
+      });
+    }
+<% } else { %>
+    // 物理削除
+    return prisma.<%= model.model.toLowerCase() %>.delete({
+      where: { id },
+    });
+<% } %>
+  },
 
   async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{ include: { <% model.relations.forEach((relation, index) => { %><%= relation %>: true<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %> } }> | null> {
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
@@ -95,3 +169,5 @@ export const <%= model.model %>Helper = {
     return new <%= model.model %>QueryBuilder().with(relations);
   },
 };
+
+<% console.log(model.fields) %>

@@ -31,7 +31,7 @@ export async function generate(
 
     // テンプレートをレンダリング
     const content = ejs.render(template, {
-      model: { model: model.name, relations },
+      model: { model: model.name, relations, fields: model.fields },
     });
 
     // ファイルに書き出し（非同期）
