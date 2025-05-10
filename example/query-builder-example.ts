@@ -1,5 +1,6 @@
 import { UserHelper } from '../prisma/generated-helpers/UserHelper';
 import { prisma } from '../src/prisma-client';
+import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
 
 (async (): Promise<void> => {
   try {
@@ -37,6 +38,13 @@ import { prisma } from '../src/prisma-client';
     console.log(
       'Users (createdAt desc):',
       usersDesc.map((u) => ({ name: u.name, createdAt: u.createdAt })),
+    );
+
+    // isActive: true のユーザーのみ取得
+    const activeUsers = await ExtendedUserHelper.active().get();
+    console.log(
+      'Active users:',
+      activeUsers.map((u) => ({ name: u.name, isActive: u.isActive })),
     );
   } catch (error) {
     console.error('Error:', error);
