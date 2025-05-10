@@ -15,6 +15,7 @@
 - TypeScript 対応
 - **型安全なリレーション事前読み込み**
 - **orderByによる型安全なソートチェーンが可能（例：orderBy('createdAt', 'desc')）**
+- **example配下でUserHelper/QueryBuilderを拡張し、active()などのカスタムクエリスコープを追加可能**
 - **withを使わなくても、全リレーションが自動でeager loadされます（自動eager load化）**
 - 例：
 - const user = await UserHelper.where({ name: 'Taro' }).first();
@@ -111,6 +112,15 @@ import { UserHelper } from '../prisma/generated-helpers/UserHelper';
     'Users (createdAt desc):',
     usersDesc.map((u) => ({ name: u.name, createdAt: u.createdAt })),
   );
+
+  // activeスコープ（拡張例）
+  // example/extended/UserHelper.ts でUserHelper/QueryBuilderを拡張し、active()を追加
+  import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
+  const activeUsers = await ExtendedUserHelper.active().get();
+  console.log(
+    'Active users:',
+    activeUsers.map((u) => ({ name: u.name, isActive: u.isActive })),
+  );
 })();
 ```
 
@@ -121,46 +131,3 @@ import { UserHelper } from '../prisma/generated-helpers/UserHelper';
   "seed": "ts-node prisma/seed.ts"
 }
 ```
-
-## 開発用スクリプト
-
-```
-"scripts": {
-  "clean": "rm -rf dist generated-helpers",
-  "build": "yarn clean && tsc && cp -R src/templates dist/templates && node ./add-shebang.js",
-  "generate": "yarn build && yarn prisma generate && yarn lint:fix",
-  "seed": "ts-node prisma/seed.ts",
-  "lint": "eslint . --ext .ts",
-  "lint:fix": "eslint . --ext .ts --fix"
-}
-```
-
-## 🚦 CI/CD
-
-このプロジェクトではGitHub Actionsを使用して以下の自動チェックを行っています：
-
-- ESLintによるコードの品質チェック
-- ビルドとPrisma生成のテスト
-- 生成されたファイルのフォーマットチェック
-
-PR作成時に自動的にこれらのチェックが実行されます。
-
-## 👥 コントリビューション
-
-コントリビューション大歓迎です！以下のガイドラインを参考にしてください：
-
-1. リポジトリをフォークし、機能ブランチを作成します
-2. コードを修正し、必要なテストを追加します
-3. `yarn lint`を実行してコードスタイルを確認します
-4. `yarn generate`を実行して、生成されたファイルが正しくフォーマットされていることを確認します
-5. 変更をコミットし、PRを作成します
-
-```
-git clone https://github.com/sakumoto-shota/prisma-relation-helper-generator.git
-cd prisma-relation-helper-generator
-yarn install
-```
-
-## 📄 ライセンス
-
-MIT © 2025 shota-sakumoto
