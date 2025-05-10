@@ -19,9 +19,7 @@ export const UserHelper = {
   where(conditions: Prisma.UserWhereInput): UserQueryBuilder<object> {
     return new UserQueryBuilder().where(conditions) as UserQueryBuilder<object>;
   },
-  with(
-    relations: (keyof Prisma.UserInclude)[]
-  ): UserQueryBuilder<object> {
+  with(relations: (keyof Prisma.UserInclude)[]): UserQueryBuilder<object> {
     return new UserQueryBuilder().with(relations) as unknown as UserQueryBuilder<object>;
   },
   active(): UserQueryBuilder<object> {
