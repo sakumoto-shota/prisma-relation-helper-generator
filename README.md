@@ -13,6 +13,12 @@
 - `ModelHelper.findById(id)` 形式のヘルパーメソッドを自動生成
 - テンプレート（EJS）で自由にカスタマイズ可能
 - TypeScript 対応
+- **型安全なリレーション事前読み込み**
+- **withを使わなくても、全リレーションが自動でeager loadされます（自動eager load化）**
+- 例：
+- const user = await UserHelper.where({ name: 'Taro' }).first();
+- // user.profile や user.posts など全リレーションが自動で取得されます
+- // with('profile')を使うとprofileのみeager loadされます
 
 ---
 
@@ -67,12 +73,27 @@ yarn prisma generate
 
 ## 使用例
 
-```
+```ts
 import { UserHelper } from '../prisma/generated-helpers/UserHelper';
 
 (async () => {
+  // 単一レコードの取得
   const user = await UserHelper.findById(1);
   console.log(user?.profile?.image);
+
+  // 条件付きで複数レコード取得
+  const users = await UserHelper.where({ name: { contains: 'Taro' } }).get();
+  console.log(users);
+
+  // 型安全なリレーション事前読み込み（withなしでも全リレーション自動eager load）
+  const userAndProfile = await UserHelper.where({ name: 'Taro' }).first();
+  console.log('User and profile:', userAndProfile?.profile);
+
+  // withを使うと特定リレーションのみeager load
+  const userWithProfile = await UserHelper.with('profile')
+    .where({ name: 'Taro' })
+    .first();
+  console.log('User with profile:', userWithProfile?.profile);
 })();
 ```
 

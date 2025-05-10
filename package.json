@@ -1,6 +1,6 @@
 {
   "name": "prisma-relation-helper-generator",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A Prisma generator to create Eloquent-like model helpers.",
   "author": "Shota Sakumoto",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@prisma/client": "^6.7.0",
+    "@prisma/client": "6.7.0",
     "@prisma/generator-helper": "^5.10.0",
     "ejs": "^3.1.9"
   },
