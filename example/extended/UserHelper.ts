@@ -11,8 +11,8 @@ export class UserQueryBuilder<
   active(): UserQueryBuilder<Include> {
     return this.where({ isActive: true }) as UserQueryBuilder<Include>;
   }
-  enableSoftDelete(): this {
-    super.enableSoftDelete();
+  setEnableSoftDelete(): this {
+    super.setEnableSoftDelete();
     return this;
   }
 }
@@ -27,17 +27,20 @@ export const UserHelper: UserHelperType = Object.assign({}, BaseUserHelper, {
   enableSoftDelete: true,
   where(conditions: Prisma.UserWhereInput): UserQueryBuilder<object> {
     const qb = new UserQueryBuilder().where(conditions);
-    if (UserHelper.enableSoftDelete) qb.enableSoftDelete();
-    return qb as UserQueryBuilder<object>;
+    if (UserHelper.enableSoftDelete)
+      (qb as unknown as UserQueryBuilder<object>).setEnableSoftDelete();
+    return qb as unknown as UserQueryBuilder<object>;
   },
   with(relations: (keyof Prisma.UserInclude)[]): UserQueryBuilder<object> {
     const qb = new UserQueryBuilder().with(relations);
-    if (UserHelper.enableSoftDelete) qb.enableSoftDelete();
+    if (UserHelper.enableSoftDelete)
+      (qb as unknown as UserQueryBuilder<object>).setEnableSoftDelete();
     return qb as unknown as UserQueryBuilder<object>;
   },
   active(): UserQueryBuilder<object> {
     const qb = new UserQueryBuilder().active();
-    if (UserHelper.enableSoftDelete) qb.enableSoftDelete();
-    return qb;
+    if (UserHelper.enableSoftDelete)
+      (qb as unknown as UserQueryBuilder<object>).setEnableSoftDelete();
+    return qb as unknown as UserQueryBuilder<object>;
   },
 });

@@ -7,7 +7,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
   private includes: Include = {} as Include;
   private conditions: Prisma.<%= model.model %>WhereInput = {};
   private order: Prisma.<%= model.model %>OrderByWithRelationInput[] = [];
-  private softDelete: boolean = false;
+  private enableSoftDelete: boolean = false;
 
   // モデルごとの全リレーション名
   static allRelations = [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>];
@@ -47,14 +47,14 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     return this;
   }
 
-  enableSoftDelete(): this {
-    this.softDelete = true;
+  setEnableSoftDelete(): this {
+    this.enableSoftDelete = true;
     return this;
   }
 
   async first(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
     const where: Prisma.<%= model.model %>WhereInput = { ...this.conditions };
-    if (this.softDelete) {
+    if (this.enableSoftDelete) {
       Object.assign(where, { deletedAt: null });
     }
     return prisma.<%= model.model.toLowerCase() %>.findFirst({
@@ -66,7 +66,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
 
   async get(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }>[]> {
     const where: Prisma.<%= model.model %>WhereInput = { ...this.conditions };
-    if (this.softDelete) {
+    if (this.enableSoftDelete) {
       Object.assign(where, { deletedAt: null });
     }
     return prisma.<%= model.model.toLowerCase() %>.findMany({
@@ -78,7 +78,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
 
   async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
     const where: Prisma.<%= model.model %>WhereUniqueInput & { deletedAt?: null } = { id };
-    if (this.softDelete) {
+    if (this.enableSoftDelete) {
       where.deletedAt = null;
     }
     return prisma.<%= model.model.toLowerCase() %>.findUnique({
@@ -94,7 +94,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
 
   async delete(id: number): Promise<<%= model.model %>> {
 <% if (model.fields && model.fields.some(f => f.name === 'deletedAt')) { %>
-    if (this.softDelete) {
+    if (this.enableSoftDelete) {
       // 論理削除
       return prisma.<%= model.model.toLowerCase() %>.update({
         where: { id },
