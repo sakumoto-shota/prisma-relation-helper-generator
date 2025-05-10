@@ -1,29 +1,32 @@
-import { UserHelper } from '../prisma/generated-helpers/UserHelper';
 import { prisma } from '../src/prisma-client';
 import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
 
 (async (): Promise<void> => {
   try {
     // 単一レコードの取得
-    const user = await UserHelper.where({ name: 'Taro' }).first();
+    const user = await ExtendedUserHelper.where({ name: 'Taro' }).first();
     console.log('Single user:', user);
 
     // 複数レコードの取得
-    const users = await UserHelper.where({ name: { contains: 'Taro' } }).get();
+    const users = await ExtendedUserHelper.where({
+      name: { contains: 'Taro' },
+    }).get();
     console.log('Multiple users:', users);
 
     // リレーションを含む取得
-    const userAndProfile = await UserHelper.where({ name: 'Taro' }).first();
+    const userAndProfile = await ExtendedUserHelper.where({
+      name: 'Taro',
+    }).first();
     console.log('User and profile:', userAndProfile?.profile);
 
     // リレーションを含むeager loading取得
-    const userWithProfile = await UserHelper.with('profile')
+    const userWithProfile = await ExtendedUserHelper.with('profile')
       .where({ name: 'Taro' })
       .first();
     console.log('User with profile:', userWithProfile?.profile);
 
     // createdAt昇順
-    const usersAsc = await UserHelper.where({})
+    const usersAsc = await ExtendedUserHelper.where({})
       .orderBy('createdAt', 'asc')
       .get();
     console.log(
@@ -32,7 +35,7 @@ import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
     );
 
     // createdAt降順
-    const usersDesc = await UserHelper.where({})
+    const usersDesc = await ExtendedUserHelper.where({})
       .orderBy('createdAt', 'desc')
       .get();
     console.log(
@@ -46,6 +49,21 @@ import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
       'Active users:',
       activeUsers.map((u) => ({ name: u.name, isActive: u.isActive })),
     );
+
+    // --- CRUD操作の例 ---
+    // 追加
+    const createdUser = await ExtendedUserHelper.create({ name: 'NewUser' });
+    console.log('Created user:', createdUser);
+
+    // 更新
+    const updatedUser = await ExtendedUserHelper.update(createdUser.id, {
+      name: 'UpdatedUser',
+    });
+    console.log('Updated user:', updatedUser);
+
+    // 削除
+    const deletedUser = await ExtendedUserHelper.delete(createdUser.id);
+    console.log('Deleted user:', deletedUser);
   } catch (error) {
     console.error('Error:', error);
   } finally {
