@@ -16,10 +16,12 @@ export class UserQueryBuilder<
 // UserHelperを拡張
 export const UserHelper = {
   ...BaseUserHelper,
-  where(conditions: Record<string, any>): UserQueryBuilder<object> {
+  where(conditions: Prisma.UserWhereInput): UserQueryBuilder<object> {
     return new UserQueryBuilder().where(conditions) as UserQueryBuilder<object>;
   },
-  with(relations: (keyof Prisma.UserInclude)[]): UserQueryBuilder<object> {
+  with(
+    relations: (keyof Prisma.UserInclude)[]
+  ): UserQueryBuilder<object> {
     return new UserQueryBuilder().with(relations) as unknown as UserQueryBuilder<object>;
   },
   active(): UserQueryBuilder<object> {
