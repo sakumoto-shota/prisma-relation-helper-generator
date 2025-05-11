@@ -40,7 +40,7 @@
 
 ```bash
 yarn add -D prisma-relation-helper-generator
-※ 現在はローカル開発中。npm パブリッシュ後、正式版をインストール可能になります。
+# npmの場合: npm install --save-dev prisma-relation-helper-generator
 ```
 
 ## 📝 Prisma schema.prisma 設定例
@@ -52,7 +52,7 @@ generator client {
 
 generator relationHelper {
   provider = "./dist/index.js"
-  output   = "./generated-helpers"
+  output   = "./dist/generated-helpers"
 }
 
 model User {
@@ -83,12 +83,12 @@ yarn build
 yarn prisma generate
 ```
 
-./prisma/generated-helpers/ ディレクトリに UserHelper.ts や ProfileHelper.ts が自動生成されます。
+`./dist/generated-helpers/` ディレクトリに UserHelper.ts や ProfileHelper.ts が自動生成されます。
 
 ## 使用例
 
 ```ts
-import { UserHelper } from '../prisma/generated-helpers/UserHelper';
+import { UserHelper } from '../dist/generated-helpers/UserHelper';
 
 (async () => {
   // 単一レコードの取得

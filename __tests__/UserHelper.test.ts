@@ -7,7 +7,7 @@ import {
   beforeEach,
   afterEach,
 } from 'vitest';
-import { UserHelper } from '../prisma/generated-helpers/UserHelper';
+import { UserHelper } from '../dist/generated-helpers/UserHelper';
 import { prisma } from '../src/prisma-client';
 
 beforeAll(async () => {
