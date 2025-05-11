@@ -36,6 +36,10 @@ jobs:
         run: |
           echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testing" > .env
           yarn prisma db push --accept-data-loss --skip-generate --schema=prisma/schema.prisma
+
+          # Prisma Clientとヘルパーを生成
+          yarn generate
+          yarn prisma generate
       - name: Run database seed
         run: yarn seed || echo "Seed failed but continuing test"
       - name: Run tests
