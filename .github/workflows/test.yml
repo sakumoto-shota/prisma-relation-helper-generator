@@ -32,6 +32,9 @@ jobs:
           cache: 'yarn'
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Create output directories
+        run: mkdir -p prisma/generated-helpers
       - name: Setup test database
         run: |
           echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testing" > .env
