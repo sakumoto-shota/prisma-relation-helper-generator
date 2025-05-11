@@ -1,0 +1,51 @@
+name: Run Vitest
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testing
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.18.1'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Create output directories
+        run: mkdir -p prisma/generated-helpers
+      - name: Setup test database
+        run: |
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testing" > .env
+          yarn prisma db push --accept-data-loss --skip-generate --schema=prisma/schema.prisma
+
+          # Prisma Clientとヘルパーを生成
+          yarn generate
+          yarn prisma generate
+      - name: Run database seed
+        run: yarn seed || echo "Seed failed but continuing test"
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testing
+        run: yarn test
