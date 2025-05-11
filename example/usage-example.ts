@@ -1,4 +1,4 @@
-import { UserHelper } from '../prisma/generated-helpers/UserHelper';
+import { UserHelper } from '../dist/generated-helpers/UserHelper';
 
 (async (): Promise<void> => {
   const user = await UserHelper.findById(1);

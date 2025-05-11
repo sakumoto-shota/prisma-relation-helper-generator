@@ -1,7 +1,7 @@
 import {
   UserHelper as BaseUserHelper,
   UserQueryBuilder as BaseUserQueryBuilder,
-} from '../../prisma/generated-helpers/UserHelper';
+} from '../../dist/generated-helpers/UserHelper';
 import { Prisma } from '@prisma/client';
 
 // UserQueryBuilderを拡張

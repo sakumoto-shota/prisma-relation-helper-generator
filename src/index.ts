@@ -6,15 +6,15 @@ import { generate } from './generator';
 generatorHandler({
   onManifest() {
     return {
-      defaultOutput: './generated-helpers',
+      defaultOutput: './dist/generated-helpers',
       prettyName: 'Prisma Relation Helper Generator',
     };
   },
   async onGenerate(options: GeneratorOptions) {
     const models = parseRelations([...options.dmmf.datamodel.models]);
 
-    const outputPath = options.generator.output?.value || './generated-helpers';
-
+    const outputPath =
+      options.generator.output?.value || './dist/generated-helpers';
     await generate(models, outputPath);
   },
 });

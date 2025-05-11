@@ -34,5 +34,5 @@ generator client {
 
 generator relationHelper {
   provider = "./dist/index.js"
-  output   = "./generated-helpers"
+  output   = "../dist/generated-helpers"
 }
