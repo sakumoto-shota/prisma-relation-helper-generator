@@ -1,6 +1,6 @@
 {
   "name": "prisma-relation-helper-generator",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A Prisma generator to create Eloquent-like model helpers.",
   "author": "Shota Sakumoto",
   "license": "MIT",
@@ -15,7 +15,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"**/*.{ts,js,json}\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "dependencies": {
     "@prisma/client": "6.7.0",
@@ -35,7 +35,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "undici": "^7.8.0",
-    "undici-types": "^7.8.0"
+    "undici-types": "^7.8.0",
+    "vitest": "^3.1.3"
   },
   "repository": {
     "type": "git",
