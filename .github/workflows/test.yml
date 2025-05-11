@@ -34,7 +34,7 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Setup test database
         run: |
-          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testing" > .env.test
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testing" > .env
           yarn prisma db push --accept-data-loss --skip-generate --schema=prisma/schema.prisma
       - name: Run database seed
         run: yarn seed || echo "Seed failed but continuing test"
