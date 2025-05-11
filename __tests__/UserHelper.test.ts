@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from 'vitest';
 import { UserHelper } from '../prisma/generated-helpers/UserHelper';
 import { prisma } from '../src/prisma-client';
 
@@ -11,6 +19,16 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await prisma.$disconnect();
+});
+
+beforeEach(() => {
+  // 各テスト前にデフォルト値にリセット
+  UserHelper.enableSoftDelete = false;
+});
+
+afterEach(() => {
+  // テスト後もfalseに戻す
+  UserHelper.enableSoftDelete = false;
 });
 
 describe('UserHelper', () => {
