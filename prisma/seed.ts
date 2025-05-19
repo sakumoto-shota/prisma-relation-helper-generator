@@ -22,6 +22,14 @@ async function main(): Promise<void> {
     },
     include: { profile: true, posts: true },
   });
+  for (const post of user1.posts) {
+    await prisma.thread.create({
+      data: {
+        title: `${post.title} - Thread 1`,
+        postId: post.id,
+      },
+    });
+  }
 
   // ユーザー2
   const user2 = await prisma.user.create({
@@ -40,6 +48,14 @@ async function main(): Promise<void> {
     },
     include: { profile: true, posts: true },
   });
+  for (const post of user2.posts) {
+    await prisma.thread.create({
+      data: {
+        title: `${post.title} - Thread 1`,
+        postId: post.id,
+      },
+    });
+  }
 
   // ユーザー3
   const user3 = await prisma.user.create({
@@ -62,6 +78,14 @@ async function main(): Promise<void> {
     },
     include: { profile: true, posts: true },
   });
+  for (const post of user3.posts) {
+    await prisma.thread.create({
+      data: {
+        title: `${post.title} - Thread 1`,
+        postId: post.id,
+      },
+    });
+  }
 
   console.log('Seed data created:', { user1, user2, user3 });
 }

@@ -1,6 +1,6 @@
 {
   "name": "prisma-relation-helper-generator",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "A Prisma generator to create Eloquent-like model helpers.",
   "author": "Shota Sakumoto",
   "license": "MIT",
