@@ -16,23 +16,23 @@ model User {
 model Profile {
   id     Int    @id @default(autoincrement())
   image  String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int    @unique
 }
 
 model Post {
-  id      Int    @id @default(autoincrement())
+  id      Int      @id @default(autoincrement())
   title   String
   content String
-  user    User   @relation(fields: [userId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  Int
   threads Thread[]
 }
 
 model Thread {
-  id     Int   @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
   title  String
-  post   Post  @relation(fields: [postId], references: [id])
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int
 }
 

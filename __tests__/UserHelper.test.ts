@@ -73,7 +73,9 @@ describe('UserHelper', () => {
         data: { title: 't1', postId: post.id },
       });
     }
-    const loaded = await UserHelper.with(['posts', 'posts.threads']).findById(user.id);
+    const loaded = await UserHelper.with(['posts', 'posts.threads']).findById(
+      user.id,
+    );
     expect(loaded?.posts[0]?.threads.length).toBeGreaterThan(0);
   });
 });
