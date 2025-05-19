@@ -14,12 +14,11 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
 
   private getIncludeWithDefaults(): Prisma.<%= model.model %>Include {
     if (Object.keys(this.includes).length === 0) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const all: any = {};
-      (<%= model.model %>QueryBuilder.allRelations as (keyof Prisma.<%= model.model %>Include)[]).forEach(rel => {
+      const all: Record<keyof Prisma.<%= model.model %>Include, true> = {} as Record<keyof Prisma.<%= model.model %>Include, true>;
+      (<%= model.model %>QueryBuilder.allRelations as (keyof Prisma.<%= model.model %>Include)[]).forEach((rel) => {
         all[rel] = true;
       });
-      return all;
+      return all as Prisma.<%= model.model %>Include;
     }
     return this.includes as Prisma.<%= model.model %>Include;
   }
@@ -29,17 +28,16 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
    * @param relations Prisma.<%= model.model %>Includeのキーまたは配列
    */
   with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<Include & { [P in K]: true }> {
+    const includes: Record<K, true> = {} as Record<K, true>;
     if (Array.isArray(relations)) {
       for (const rel of relations) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.includes as any)[rel] = true;
+        includes[rel] = true;
       }
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this.includes as any)[relations] = true;
+      includes[relations] = true;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this as any;
+    this.includes = { ...this.includes, ...includes } as Include & Record<K, true>;
+    return this as unknown as <%= model.model %>QueryBuilder<Include & { [P in K]: true }>;
   }
 
   orderBy(column: keyof Prisma.<%= model.model %>OrderByWithRelationInput, direction: 'asc' | 'desc'): this {

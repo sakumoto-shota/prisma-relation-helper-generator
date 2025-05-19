@@ -39,6 +39,5 @@ export async function generate(
       path.join(outputPath, `${model.name}Helper.ts`),
       content,
     );
-    console.log(`✅ ${model.name}Helper.ts を生成しました`);
   }
 }
