@@ -26,6 +26,14 @@ model Post {
   content String
   user    User   @relation(fields: [userId], references: [id])
   userId  Int
+  threads Thread[]
+}
+
+model Thread {
+  id     Int   @id @default(autoincrement())
+  title  String
+  post   Post  @relation(fields: [postId], references: [id])
+  postId Int
 }
 
 generator client {

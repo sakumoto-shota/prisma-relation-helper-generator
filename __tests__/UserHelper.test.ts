@@ -59,4 +59,21 @@ describe('UserHelper', () => {
     const deleted = await UserHelper.findById(user.id);
     expect(deleted).toBeNull();
   });
+
+  it('should eager load posts and threads', async () => {
+    const user = await UserHelper.create({
+      name: 'ThreadUser',
+      posts: {
+        create: [{ title: 'p1', content: 'c1' }],
+      },
+    });
+    const post = await prisma.post.findFirst({ where: { userId: user.id } });
+    if (post) {
+      await prisma.thread.create({
+        data: { title: 't1', postId: post.id },
+      });
+    }
+    const loaded = await UserHelper.with(['posts', 'posts.threads']).findById(user.id);
+    expect(loaded?.posts[0]?.threads.length).toBeGreaterThan(0);
+  });
 });

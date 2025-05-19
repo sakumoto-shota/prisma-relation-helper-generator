@@ -1,0 +1,6 @@
+-- CreateTable
+CREATE TABLE "Thread" (
+  "id" SERIAL PRIMARY KEY,
+  "title" TEXT NOT NULL,
+  "postId" INTEGER NOT NULL REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

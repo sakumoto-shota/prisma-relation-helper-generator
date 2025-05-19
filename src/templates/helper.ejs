@@ -27,17 +27,29 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
    * リレーションを動的に指定する（型安全）
    * @param relations Prisma.<%= model.model %>Includeのキーまたは配列
    */
-  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<Include & { [P in K]: true }> {
-    const includes: Record<K, true> = {} as Record<K, true>;
+  with(relations: string | string[]): this {
+    const add = (path: string): void => {
+      const parts = path.split('.');
+      let target = this.includes as unknown as Record<string, unknown>;
+      for (const [index, part] of parts.entries()) {
+        if (index === parts.length - 1) {
+          target[part] = true;
+        } else {
+          if (target[part] === undefined || target[part] === true) {
+            target[part] = { include: {} };
+          }
+          target = (target[part] as { include: Record<string, unknown> }).include;
+        }
+      }
+    };
     if (Array.isArray(relations)) {
       for (const rel of relations) {
-        includes[rel] = true;
+        add(rel);
       }
     } else {
-      includes[relations] = true;
+      add(relations);
     }
-    this.includes = { ...this.includes, ...includes } as Include & Record<K, true>;
-    return this as unknown as <%= model.model %>QueryBuilder<Include & { [P in K]: true }>;
+    return this;
   }
 
   orderBy(column: keyof Prisma.<%= model.model %>OrderByWithRelationInput, direction: 'asc' | 'desc'): this {
@@ -163,7 +175,7 @@ export const <%= model.model %>Helper = {
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
     return new <%= model.model %>QueryBuilder().where(conditions);
   },
-  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<{ [P in K]: true }> {
+  with(relations: string | string[]): <%= model.model %>QueryBuilder<object> {
     return new <%= model.model %>QueryBuilder().with(relations);
   },
 };

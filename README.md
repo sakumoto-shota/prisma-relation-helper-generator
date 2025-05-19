@@ -34,6 +34,11 @@
 - generator.tsでテンプレートに `fields` を渡すことでdeletedAt判定の型安全性を向上
 - example配下の利用例で論理削除・物理削除の切り替え動作を確認可能
 
+## 🆕 Threadモデルとネストリレーションeager load
+
+- Postモデルに複数のThreadを紐付けるThreadモデルを追加
+- `UserHelper.with(['posts', 'posts.threads'])` でポストとそのスレッドを一括で読み込むことが可能
+
 ---
 
 ## 📦 インストール
