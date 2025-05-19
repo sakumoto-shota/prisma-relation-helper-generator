@@ -15,7 +15,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"**/*.{ts,js,json}\"",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prisma:reset": "npx prisma db push --force-reset && npx prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "6.7.0",
