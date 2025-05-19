@@ -1,5 +1,6 @@
 // 自動生成されたヘルパー - <%= model.model %>
 import { Prisma, <%= model.model %> } from '@prisma/client';
+import type { IncludesFromArray } from '../../src/include-types';
 // PrismaClientSingletonの共通モジュールをインポート
 import { prisma } from '../../src/prisma-client';
 
@@ -27,7 +28,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
    * リレーションを動的に指定する（型安全）
    * @param relations Prisma.<%= model.model %>Includeのキーまたは配列
    */
-  with(relations: string | string[]): this {
+  with<Paths extends string>(relations: Paths | Paths[]): <%= model.model %>QueryBuilder<Include & IncludesFromArray<Paths[]>> {
     const add = (path: string): void => {
       const parts = path.split('.');
       let target = this.includes as unknown as Record<string, unknown>;
@@ -49,7 +50,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     } else {
       add(relations);
     }
-    return this;
+    return this as unknown as <%= model.model %>QueryBuilder<Include & IncludesFromArray<Paths[]>>;
   }
 
   orderBy(column: keyof Prisma.<%= model.model %>OrderByWithRelationInput, direction: 'asc' | 'desc'): this {
@@ -62,7 +63,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     return this;
   }
 
-  async first(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
+  async first(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Include }> | null> {
     const where: Prisma.<%= model.model %>WhereInput = { ...this.conditions };
     if (this.enableSoftDelete) {
       Object.assign(where, { deletedAt: null });
@@ -74,7 +75,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     });
   }
 
-  async get(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }>[]> {
+  async get(): Promise<Prisma.<%= model.model %>GetPayload<{ include: Include }>[]> {
     const where: Prisma.<%= model.model %>WhereInput = { ...this.conditions };
     if (this.enableSoftDelete) {
       Object.assign(where, { deletedAt: null });
@@ -86,7 +87,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
     });
   }
 
-  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{ include: Prisma.<%= model.model %>Include }> | null> {
+  async findById(id: number): Promise<Prisma.<%= model.model %>GetPayload<{ include: Include }> | null> {
     const where: Prisma.<%= model.model %>WhereUniqueInput & { deletedAt?: null } = { id };
     if (this.enableSoftDelete) {
       where.deletedAt = null;
@@ -175,7 +176,7 @@ export const <%= model.model %>Helper = {
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
     return new <%= model.model %>QueryBuilder().where(conditions);
   },
-  with(relations: string | string[]): <%= model.model %>QueryBuilder<object> {
-    return new <%= model.model %>QueryBuilder().with(relations);
+  with<Paths extends string>(relations: Paths | Paths[]): <%= model.model %>QueryBuilder<IncludesFromArray<Paths[]>> {
+    return new <%= model.model %>QueryBuilder<IncludesFromArray<Paths[]>>().with(relations);
   },
 };
