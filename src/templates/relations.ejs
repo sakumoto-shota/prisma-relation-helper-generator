@@ -1,5 +1,5 @@
 import { prisma } from '../../src/prisma-client';
-import { <%= model.model %> } from '@prisma/client';
+import { <%= model.model %><% model.relationMethods.forEach((rel) => { %>, <%= rel.relatedModel %><% }); %> } from '@prisma/client';
 
 export class <%= model.model %>Relations {
   constructor(private readonly record: <%= model.model %>) {}

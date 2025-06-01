@@ -17,7 +17,7 @@ export interface RelationMethodInfo {
 export interface ParsedModel {
   model: string;
   relations: string[];
-  fields: DMMF.Field[];
+  fields: readonly DMMF.Field[];
   relationMethods: RelationMethodInfo[];
 }
 

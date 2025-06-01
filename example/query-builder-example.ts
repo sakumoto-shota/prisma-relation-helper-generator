@@ -1,5 +1,6 @@
 import { prisma } from '../src/prisma-client';
 import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
+import { UserRelations } from '../dist/generated-helpers/UserRelations';
 
 (async (): Promise<void> => {
   try {
@@ -9,7 +10,7 @@ import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
 
     // 複数レコードの取得
     const users = await ExtendedUserHelper.where({
-      name: { contains: 'Taro' },
+      name: { contains: 'a' },
     }).get();
     console.log('Multiple users:', users);
 
@@ -24,6 +25,14 @@ import { UserHelper as ExtendedUserHelper } from './extended/UserHelper';
       .where({ name: 'Taro' })
       .first();
     console.log('User with profile:', userWithProfile?.profile);
+
+    // UserRelationsの使用例
+    if (userWithProfile) {
+      const relations = new UserRelations(userWithProfile);
+      const posts = await relations.posts();
+      console.log('Posts count:', posts.length);
+      console.log('Posts:', posts);
+    }
 
     // createdAt昇順
     const usersAsc = await ExtendedUserHelper.where({})
