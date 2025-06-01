@@ -17,6 +17,7 @@
 - **orderByによる型安全なソートチェーンが可能（例：orderBy('createdAt', 'desc')）**
 - **example配下でUserHelper/QueryBuilderを拡張し、active()などのカスタムクエリスコープを追加可能**
 - **withを使わなくても、全リレーションが自動でeager loadされます（自動eager load化）**
+- **new UserRelations(user).posts() のように hasMany や many-to-many、through に対応したインスタンス用メソッドを生成**
 - 例：
 - const user = await UserHelper.where({ name: 'Taro' }).first();
 - // user.profile や user.posts など全リレーションが自動で取得されます
@@ -89,6 +90,7 @@ yarn prisma generate
 
 ```ts
 import { UserHelper } from '../dist/generated-helpers/UserHelper';
+import { UserRelations } from '../dist/generated-helpers/UserRelations';
 
 (async () => {
   // 単一レコードの取得
@@ -108,6 +110,11 @@ import { UserHelper } from '../dist/generated-helpers/UserHelper';
     .where({ name: 'Taro' })
     .first();
   console.log('User with profile:', userWithProfile?.profile);
+
+  // 関連メソッドの利用例
+  const relations = new UserRelations(userWithProfile!);
+  const posts = await relations.posts();
+  console.log('Posts count:', posts.length);
 
   // createdAt昇順ソート
   const usersAsc = await UserHelper.where({}).orderBy('createdAt', 'asc').get();
@@ -141,5 +148,15 @@ import { UserHelper } from '../dist/generated-helpers/UserHelper';
 ```
 "scripts": {
   "seed": "ts-node prisma/seed.ts"
+}
+```
+
+## データベースリセット（オプション）
+
+開発環境でDBをリセットしたい場合は、以下のスクリプトを利用できます。
+
+```
+"scripts": {
+  "prisma:reset": "npx prisma db push --force-reset && npx prisma db seed"
 }
 ```
