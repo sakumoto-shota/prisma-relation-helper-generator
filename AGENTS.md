@@ -53,7 +53,7 @@ export function isValidUser(u: unknown): u is User {
 
 ### タイトルの形式
 
-`[type-puzzle] <タイトル>`
+`[relation-helper-generator] <タイトル>`
 
 PRテンプレートは `.github/PULL_REQUEST_TEMPLATE.md` を参照してください。
 
