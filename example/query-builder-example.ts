@@ -26,6 +26,12 @@ import { UserRelations } from '../dist/generated-helpers/UserRelations';
       .first();
     console.log('User with profile:', userWithProfile?.profile);
 
+    // ネストしたリレーションを含むeager loading取得
+    const userWithProfileImage = await ExtendedUserHelper.with('profile.image')
+      .where({ name: 'Taro' })
+      .first();
+    console.log('User with profile image:', userWithProfileImage?.profile?.image);
+
     // UserRelationsの使用例
     if (userWithProfile) {
       const relations = new UserRelations(userWithProfile);

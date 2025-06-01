@@ -19,6 +19,7 @@ export interface ParsedModel {
   relations: string[];
   fields: readonly DMMF.Field[];
   relationMethods: RelationMethodInfo[];
+  relationMap: Record<string, string>;
 }
 
 /**
@@ -35,6 +36,10 @@ export function parseRelations(models: DMMF.Model[]): ParsedModel[] {
   return relationModels.map((model) => {
     const relationFields = model.fields.filter((f) => f.kind === 'object');
     const relations = relationFields.map((f) => f.name);
+    const relationMap: Record<string, string> = {};
+    for (const f of relationFields) {
+      relationMap[f.name] = f.type;
+    }
     const relationMethods: RelationMethodInfo[] = [];
 
     for (const field of relationFields) {
@@ -113,6 +118,7 @@ export function parseRelations(models: DMMF.Model[]): ParsedModel[] {
       relations,
       fields: model.fields,
       relationMethods,
+      relationMap,
     };
   });
 }
