@@ -1,10 +1,14 @@
-# Node.js
+src/
+example/
+prisma/
+*.ts
+tsconfig.json
+.eslintrc.*
+.prettierrc
+add-shebang.js
+.gitignore
+.vscode/
 node_modules/
-
-# Env files
 .env
 .env.*
-
-# IDEs
-.vscode/
 .idea/
