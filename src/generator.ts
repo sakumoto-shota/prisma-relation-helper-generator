@@ -1,8 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as ejs from 'ejs';
-import { DMMF } from '@prisma/generator-helper';
-import { parseRelations } from './parser';
+import { ParsedModel } from './parser';
 
 /**
  * Prismaモデルからヘルパークラスを生成する
@@ -11,33 +10,27 @@ import { parseRelations } from './parser';
  * @param outputPath 出力ディレクトリのパス
  */
 export async function generate(
-  models: DMMF.Model[],
+  models: ParsedModel[],
   outputPath: string,
 ): Promise<void> {
-  // リレーションを持つモデルだけを抽出
-  // 注: parseRelations関数はDMMF.Model[]を返します
-  const parsedModels = parseRelations(models);
+  const helperPath = path.join(__dirname, 'templates/helper.ejs');
+  const relationPath = path.join(__dirname, 'templates/relations.ejs');
+  const helperTemplate = await fs.readFile(helperPath, 'utf-8');
+  const relationTemplate = await fs.readFile(relationPath, 'utf-8');
 
-  // テンプレートファイルの読み込み（非同期）
-  const templatePath = path.join(__dirname, 'templates/helper.ejs');
-  const template = await fs.readFile(templatePath, 'utf-8');
-
-  // 各モデルに対してヘルパーファイルを生成
-  for (const model of parsedModels) {
-    // モデルのフィールドからリレーション情報を抽出
-    const relations = model.fields
-      .filter((f) => f.kind === 'object')
-      .map((f) => f.name);
-
-    // テンプレートをレンダリング
-    const content = ejs.render(template, {
-      model: { model: model.name, relations, fields: model.fields },
-    });
-
-    // ファイルに書き出し（非同期）
+  for (const model of models) {
+    const helperContent = ejs.render(helperTemplate, { model });
     await fs.writeFile(
-      path.join(outputPath, `${model.name}Helper.ts`),
-      content,
+      path.join(outputPath, `${model.model}Helper.ts`),
+      helperContent,
     );
+
+    if (model.relationMethods.length > 0) {
+      const relationContent = ejs.render(relationTemplate, { model });
+      await fs.writeFile(
+        path.join(outputPath, `${model.model}Relations.ts`),
+        relationContent,
+      );
+    }
   }
 }
