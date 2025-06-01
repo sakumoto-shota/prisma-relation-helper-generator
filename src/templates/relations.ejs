@@ -1,0 +1,30 @@
+import { prisma } from '../../src/prisma-client';
+import { <%= model.model %> } from '@prisma/client';
+
+export class <%= model.model %>Relations {
+  constructor(private readonly record: <%= model.model %>) {}
+
+<% model.relationMethods.forEach((rel) => { -%>
+<% if (rel.type === 'hasMany') { -%>
+  <%= rel.name %>(): Promise<<%= rel.relatedModel %>[]> {
+    return prisma.<%= rel.relatedModel.toLowerCase() %>.findMany({
+      where: { <%= rel.foreignKey %>: this.record.id },
+    });
+  }
+<% } else if (rel.type === 'manyToMany') { -%>
+  <%= rel.name %>(): Promise<<%= rel.relatedModel %>[]> {
+    return prisma.<%= model.model.toLowerCase() %>.findUnique({
+      where: { id: this.record.id },
+      include: { <%= rel.name %>: true },
+    }).then((res) => res?.<%= rel.name %> ?? []);
+  }
+<% } else if (rel.type === 'through') { -%>
+  <%= rel.name %>(): Promise<<%= rel.relatedModel %>[]> {
+    return prisma.<%= rel.pivotModel.toLowerCase() %>.findMany({
+      where: { <%= rel.foreignKey %>: this.record.id },
+      include: { <%= rel.pivotRelatedField %>: true },
+    }).then((rows) => rows.map((r) => r.<%= rel.pivotRelatedField %>));
+  }
+<% } -%>
+<% }); -%>
+}
