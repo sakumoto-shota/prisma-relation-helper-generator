@@ -143,3 +143,13 @@ import { UserHelper } from '../dist/generated-helpers/UserHelper';
   "seed": "ts-node prisma/seed.ts"
 }
 ```
+
+## データベースリセット（オプション）
+
+開発環境でDBをリセットしたい場合は、以下のスクリプトを利用できます。
+
+```
+"scripts": {
+  "prisma:reset": "npx prisma db push --force-reset && npx prisma db seed"
+}
+```
