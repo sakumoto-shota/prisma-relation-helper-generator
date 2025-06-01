@@ -2,6 +2,7 @@
 import { Prisma, <%= model.model %> } from '@prisma/client';
 // PrismaClientSingletonの共通モジュールをインポート
 import { prisma } from '../../src/prisma-client';
+import { buildNestedInclude, mergeIncludes } from '../../src/include-utils';
 
 export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.model %>Include = object> {
   private includes: Include = {} as Include;
@@ -11,6 +12,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
 
   // モデルごとの全リレーション名
   static allRelations = [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>];
+  static relationTree = {<% const entries = Object.entries(model.relationMap); entries.forEach(([k,v], index) => { %>'<%= k %>': '<%= v %>'<%= index < entries.length - 1 ? ', ' : '' %><% }); %>};
 
   private getIncludeWithDefaults(): Prisma.<%= model.model %>Include {
     if (Object.keys(this.includes).length === 0) {
@@ -27,14 +29,27 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
    * リレーションを動的に指定する（型安全）
    * @param relations Prisma.<%= model.model %>Includeのキーまたは配列
    */
-  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<Include & { [P in K]: true }> {
-    const includes: Record<K, true> = {} as Record<K, true>;
-    if (Array.isArray(relations)) {
-      for (const rel of relations) {
+  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<Include & { [P in K]: true }>;
+  with(path: string): <%= model.model %>QueryBuilder<Include>;
+  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[] | string): <%= model.model %>QueryBuilder<Include> {
+    if (typeof relations === 'string') {
+      if (relations.includes('.')) {
+        const nested = buildNestedInclude('<%= model.model %>', relations, <%= model.model %>QueryBuilder.relationTree);
+        this.includes = mergeIncludes(this.includes as Record<string, unknown>, nested) as Include;
+        return this as unknown as <%= model.model %>QueryBuilder<Include>;
+      }
+      const arr: K[] = [relations as K];
+      const includes: Partial<Record<K, true>> = {};
+      for (const rel of arr) {
         includes[rel] = true;
       }
-    } else {
-      includes[relations] = true;
+      this.includes = { ...this.includes, ...includes } as Include & Record<K, true>;
+      return this as unknown as <%= model.model %>QueryBuilder<Include & { [P in K]: true }>;
+    }
+    const arr = Array.isArray(relations) ? relations : [relations];
+    const includes: Partial<Record<K, true>> = {};
+    for (const rel of arr) {
+      includes[rel] = true;
     }
     this.includes = { ...this.includes, ...includes } as Include & Record<K, true>;
     return this as unknown as <%= model.model %>QueryBuilder<Include & { [P in K]: true }>;
@@ -116,6 +131,7 @@ export class <%= model.model %>QueryBuilder<Include extends Prisma.<%= model.mod
 export const <%= model.model %>Helper = {
   modelName: '<%= model.model %>',
   relations: [<% model.relations.forEach((relation, index) => { %>'<%= relation %>'<%= index < model.relations.length - 1 ? ', ' : '' %><% }); %>],
+  relationTree: {<% const entries = Object.entries(model.relationMap); entries.forEach(([k,v], index) => { %>'<%= k %>': '<%= v %>'<%= index < entries.length - 1 ? ', ' : '' %><% }); %>},
   enableSoftDelete: false,
 
   async create(data: Prisma.<%= model.model %>CreateInput): Promise<<%= model.model %>> {
@@ -163,7 +179,7 @@ export const <%= model.model %>Helper = {
   where(conditions: Prisma.<%= model.model %>WhereInput): <%= model.model %>QueryBuilder {
     return new <%= model.model %>QueryBuilder().where(conditions);
   },
-  with<K extends keyof Prisma.<%= model.model %>Include>(relations: K | K[]): <%= model.model %>QueryBuilder<{ [P in K]: true }> {
-    return new <%= model.model %>QueryBuilder().with(relations);
+  with(relations: keyof Prisma.<%= model.model %>Include | (keyof Prisma.<%= model.model %>Include)[] | string): <%= model.model %>QueryBuilder<object> {
+    return new <%= model.model %>QueryBuilder().with(relations as unknown as never);
   },
 };
